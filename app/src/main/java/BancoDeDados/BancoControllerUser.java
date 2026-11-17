@@ -109,7 +109,6 @@ public class BancoControllerUser {
         );
     }
 
-    // VERIFICAR PERMISSAO DO USUARIO
     public boolean verificarPermissao(
             int usuarioId,
             String permissao) {
@@ -141,6 +140,50 @@ public class BancoControllerUser {
         cursor.close();
 
         return permitido;
+    }
+
+    public int Login(String login, String senhaHash, Context context) {
+
+        db = banco.getReadableDatabase();
+
+        Cursor cursor = db.rawQuery(
+                "SELECT Id, nome, perfilId FROM Usuario " +
+                        "WHERE login = ? AND senhahash = ? AND ativo = 1",
+                new String[]{login, senhaHash}
+        );
+
+        if (cursor.moveToFirst()) {
+
+            // Recuperar dados do usuário
+            int id = cursor.getInt(cursor.getColumnIndexOrThrow("Id"));
+            String nome = cursor.getString(cursor.getColumnIndexOrThrow("nome"));
+            int perfilId = cursor.getInt(cursor.getColumnIndexOrThrow("perfilId"));
+
+            // Criar sessão
+            android.content.SharedPreferences prefs =
+                    context.getSharedPreferences("Sessao", Context.MODE_PRIVATE);
+
+            android.content.SharedPreferences.Editor editor = prefs.edit();
+
+            editor.putInt("usuarioId", id);
+            editor.putString("usuarioNome", nome);
+            editor.putInt("perfilId", perfilId);
+            editor.putBoolean("logado", true);
+
+            editor.apply();
+
+            cursor.close();
+            db.close();
+
+            return 1; // Login bem sucedido
+
+        } else {
+
+            cursor.close();
+            db.close();
+
+            return 0; // Login incorreto
+        }
     }
 
     public void fecharBanco() {
