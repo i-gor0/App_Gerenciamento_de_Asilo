@@ -14,6 +14,12 @@ public class CriaBanco extends SQLiteOpenHelper {
     }
 
     @Override
+    public void onConfigure(SQLiteDatabase db) {
+        super.onConfigure(db);
+        db.setForeignKeyConstraintsEnabled(true);
+    }
+
+    @Override
     public void onCreate(SQLiteDatabase db) {
         db.execSQL("CREATE TABLE Perfil (" +
                 "Id INTEGER PRIMARY KEY AUTOINCREMENT, " +
@@ -73,7 +79,7 @@ public class CriaBanco extends SQLiteOpenHelper {
 
         db.execSQL("CREATE TABLE Notificacao (" +
                 "Id INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                "movimentacaoId INTEGER NOT NULL, " +
+                "movimentacaoId INTEGER NOT NULL UNIQUE, " +
                 "mensagem TEXT NOT NULL, " +
                 "datahora TEXT NOT NULL, " +
                 "lida INTEGER DEFAULT 0, " +
