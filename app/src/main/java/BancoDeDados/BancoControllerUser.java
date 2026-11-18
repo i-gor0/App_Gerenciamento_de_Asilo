@@ -3,6 +3,7 @@ package BancoDeDados;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
@@ -185,7 +186,16 @@ public class BancoControllerUser {
             return 0; // Login incorreto
         }
     }
+    public void Logout(Context context) {
+        SharedPreferences preferencias = context.getSharedPreferences(
+                "Sessao",
+                Context.MODE_PRIVATE
+        );
 
+        SharedPreferences.Editor editor = preferencias.edit();
+        editor.clear();
+        editor.apply();
+    }
     public void fecharBanco() {
         banco.close();
     }
