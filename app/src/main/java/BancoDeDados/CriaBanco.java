@@ -17,6 +17,7 @@ public class CriaBanco extends SQLiteOpenHelper {
     public void onConfigure(SQLiteDatabase db) {
         super.onConfigure(db);
         db.setForeignKeyConstraintsEnabled(true);
+
     }
 
     @Override
@@ -84,10 +85,19 @@ public class CriaBanco extends SQLiteOpenHelper {
                 "datahora TEXT NOT NULL, " +
                 "lida INTEGER DEFAULT 0, " +
                 "FOREIGN KEY (movimentacaoId) REFERENCES Movimentacao(Id));");
+
+        db.execSQL("CREATE TABLE EstoqueGeral (" +
+                "Id INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                "produtoId INTEGER NOT NULL UNIQUE, " +
+                "quantidadeatual INTEGER DEFAULT 0, " +
+                "quantidademinima INTEGER DEFAULT 0, " +
+                "FOREIGN KEY(produtoId) REFERENCES Produto(Id))");
     }
+
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+        db.execSQL("DROP TABLE IF EXISTS EstoqueGeral");
         db.execSQL("DROP TABLE IF EXISTS Notificacao");
         db.execSQL("DROP TABLE IF EXISTS Movimentacao");
         db.execSQL("DROP TABLE IF EXISTS Estoque");
