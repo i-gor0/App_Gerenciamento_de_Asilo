@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fillViewport="true"
+    android:background="#F1F3F7">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="24dp">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Gerenciamento de quartos"
+            android:textSize="26sp"
+            android:textStyle="bold"
+            android:textColor="#24344A" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Consulte e gerencie os quartos da instituição."
+            android:textSize="15sp"
+            android:textColor="#687586"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="25dp" />
+
+        <Button
+            android:id="@+id/btnAdicionarQuarto"
+            android:layout_width="match_parent"
+            android:layout_height="55dp"
+            android:text="Adicionar quarto"
+            android:textColor="#FFFFFF"
+            android:backgroundTint="#2876C7" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Quartos cadastrados"
+            android:textSize="19sp"
+            android:textStyle="bold"
+            android:textColor="#24344A"
+            android:layout_marginTop="30dp"
+            android:layout_marginBottom="15dp" />
+
+        <LinearLayout
+            android:id="@+id/containerQuartos"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/tvQuartosVazios"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Nenhum quarto cadastrado."
+                android:textSize="15sp"
+                android:textColor="#687586"
+                android:gravity="center"
+                android:padding="30dp" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</ScrollView>
