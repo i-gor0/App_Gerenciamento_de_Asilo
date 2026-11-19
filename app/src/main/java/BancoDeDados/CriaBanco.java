@@ -48,6 +48,11 @@ public class CriaBanco extends SQLiteOpenHelper {
                 "quartoId INTEGER NOT NULL, " +
                 "nome TEXT NOT NULL, " +
                 "datanascimento TEXT, " +
+                "cpf text not null, " +
+                "telefonePaciente TEXT NOT NULL, " +
+                "telefoneResponsavel TEXT NOT NULL, " +
+                "nomeResponsavel TEXT NOT NULL, " +
+                "enderecoResponsavel TEXT NOT NULL, " +
                 "observacoes TEXT, " +
                 "FOREIGN KEY (quartoId) REFERENCES Quarto(Id));");
 

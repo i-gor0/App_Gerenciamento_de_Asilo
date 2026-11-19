@@ -15,10 +15,16 @@ public class BancoControllerPaciente {
         banco = new CriaBanco(context);
     }
 
+    // Cadastrar paciente
     public String insereDados(
             int quartoId,
             String nome,
             String dataNascimento,
+            String cpf,
+            String telefonePaciente,
+            String telefoneResponsavel,
+            String nomeResponsavel,
+            String enderecoResponsavel,
             String observacoes) {
 
         db = banco.getWritableDatabase();
@@ -27,6 +33,11 @@ public class BancoControllerPaciente {
         valores.put("quartoId", quartoId);
         valores.put("nome", nome);
         valores.put("datanascimento", dataNascimento);
+        valores.put("cpf", cpf);
+        valores.put("telefonePaciente", telefonePaciente);
+        valores.put("telefoneResponsavel", telefoneResponsavel);
+        valores.put("nomeResponsavel", nomeResponsavel);
+        valores.put("enderecoResponsavel", enderecoResponsavel);
         valores.put("observacoes", observacoes);
 
         long resultado = db.insert("Paciente", null, valores);
@@ -38,6 +49,7 @@ public class BancoControllerPaciente {
         return "Paciente cadastrado com sucesso";
     }
 
+    // Listar todos os pacientes com o número do quarto
     public Cursor listarPacientes() {
 
         db = banco.getReadableDatabase();
@@ -50,6 +62,7 @@ public class BancoControllerPaciente {
         );
     }
 
+    // Buscar paciente pelo ID
     public Cursor buscarPaciente(int id) {
 
         db = banco.getReadableDatabase();
@@ -60,11 +73,17 @@ public class BancoControllerPaciente {
         );
     }
 
+    // Atualizar dados do paciente
     public String atualizarPaciente(
             int id,
             int quartoId,
             String nome,
             String dataNascimento,
+            String cpf,
+            String telefonePaciente,
+            String telefoneResponsavel,
+            String nomeResponsavel,
+            String enderecoResponsavel,
             String observacoes) {
 
         db = banco.getWritableDatabase();
@@ -73,6 +92,11 @@ public class BancoControllerPaciente {
         valores.put("quartoId", quartoId);
         valores.put("nome", nome);
         valores.put("datanascimento", dataNascimento);
+        valores.put("cpf", cpf);
+        valores.put("telefonePaciente", telefonePaciente);
+        valores.put("telefoneResponsavel", telefoneResponsavel);
+        valores.put("nomeResponsavel", nomeResponsavel);
+        valores.put("enderecoResponsavel", enderecoResponsavel);
         valores.put("observacoes", observacoes);
 
         int resultado = db.update(
@@ -90,6 +114,7 @@ public class BancoControllerPaciente {
         return "Erro ao atualizar paciente";
     }
 
+    // Excluir paciente
     public String excluirPaciente(int id) {
 
         db = banco.getWritableDatabase();
