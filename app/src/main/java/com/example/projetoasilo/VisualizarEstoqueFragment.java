@@ -14,9 +14,14 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import androidx.activity.result.ActivityResultLauncher;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
+
+import com.journeyapps.barcodescanner.ScanContract;
+import com.journeyapps.barcodescanner.ScanOptions;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -39,6 +44,7 @@ public class VisualizarEstoqueFragment extends Fragment {
     private static class Item {
         int produtoId;
         String nome;
+        String codigo;
         String unidade;
         int quantidade;
         int minimo;
@@ -47,6 +53,14 @@ public class VisualizarEstoqueFragment extends Fragment {
     private final List<Item> itens = new ArrayList<>();
     private EditText etBuscar;
     private LinearLayout containerProdutos;
+
+    // Leitor de QR code: identifica o produto e abre as ações dele
+    private final ActivityResultLauncher<ScanOptions> leitor =
+            registerForActivityResult(new ScanContract(), resultado -> {
+                if (!isAdded()) return;
+                String codigo = QrCodeHelper.lido(requireContext(), resultado);
+                if (codigo != null) aoLerCodigo(codigo);
+            });
 
     @Nullable
     @Override
@@ -60,8 +74,11 @@ public class VisualizarEstoqueFragment extends Fragment {
         etBuscar = v.findViewById(R.id.etBuscarProduto);
         containerProdutos = v.findViewById(R.id.containerProdutosEstoque);
 
+        v.findViewById(R.id.btnEscanearQR).setOnClickListener(x ->
+                leitor.launch(QrCodeHelper.opcoesLeitor("Aponte a câmera para o QR code do produto")));
+
         v.findViewById(R.id.btnCadastrarProduto).setOnClickListener(x ->
-                ((MainActivity) requireActivity()).abrir(new CadastrarProdutoFragment(), true));
+                ((MainActivity) requireActivity()).abrir(CadastrarProdutoFragment.novo(null), true));
 
         v.findViewById(R.id.btnAbastecerEstoque).setOnClickListener(x -> abastecer(null));
 
@@ -84,17 +101,60 @@ public class VisualizarEstoqueFragment extends Fragment {
     private void carregar() {
         itens.clear();
         Cursor c = new BancoControllerProduto(requireContext()).listarProdutosComEstoque();
-        while (c.moveToNext()) {
-            Item it = new Item();
-            it.produtoId = Util.num(c, "produtoId");
-            it.nome = Util.str(c, "nome");
-            it.unidade = Util.str(c, "unidade");
-            it.quantidade = Util.num(c, "quantidade");
-            it.minimo = Util.num(c, "minimo");
-            itens.add(it);
-        }
+        while (c.moveToNext()) itens.add(lerItem(c));
         c.close();
         renderizar();
+    }
+
+    private Item lerItem(Cursor c) {
+        Item it = new Item();
+        it.produtoId = Util.num(c, "produtoId");
+        it.nome = Util.str(c, "nome");
+        it.codigo = Util.str(c, "codigoqr");
+        it.unidade = Util.str(c, "unidade");
+        it.quantidade = Util.num(c, "quantidade");
+        it.minimo = Util.num(c, "minimo");
+        return it;
+    }
+
+    // ------------------------------------------------------------------
+    // QR code: produto lido pela câmera
+    // ------------------------------------------------------------------
+    private void aoLerCodigo(String codigo) {
+        Cursor c = new BancoControllerProduto(requireContext()).buscarPorCodigoQR(codigo);
+        Item it = c.moveToFirst() ? lerItem(c) : null;
+        c.close();
+
+        if (it != null) {
+            menuProduto(it);
+            return;
+        }
+
+        // Código desconhecido: oferece cadastrar um produto novo com esse código
+        new AlertDialog.Builder(requireContext())
+                .setTitle("Produto não cadastrado")
+                .setMessage("Nenhum produto com o código:\n" + codigo
+                        + "\n\nDeseja cadastrar um produto com este código?")
+                .setPositiveButton("Cadastrar", (d, w) -> {
+                    if (Util.pode(requireContext(), "podecadastrar")) {
+                        ((MainActivity) requireActivity())
+                                .abrir(CadastrarProdutoFragment.novo(codigo), true);
+                    }
+                })
+                .setNegativeButton("Cancelar", null)
+                .show();
+    }
+
+    /** Ações disponíveis para um produto (toque no card ou leitura do QR code). */
+    private void menuProduto(Item it) {
+        Util.escolher(requireContext(),
+                it.nome + " (" + it.quantidade + " " + it.unidade + ")",
+                new String[]{"Abastecer estoque", "Transferir para paciente", "Ver QR code"},
+                i -> {
+                    if (i == 0) abastecer(it);
+                    else if (i == 1) transferir(it);
+                    else QrCodeHelper.mostrar(requireContext(), it.nome, it.codigo, null);
+                });
     }
 
     // ------------------------------------------------------------------
@@ -156,12 +216,7 @@ public class VisualizarEstoqueFragment extends Fragment {
         card.addView(titulo);
         card.addView(detalhe);
 
-        card.setOnClickListener(v -> Util.escolher(requireContext(), it.nome,
-                new String[]{"Abastecer estoque", "Transferir para paciente"},
-                i -> {
-                    if (i == 0) abastecer(it);
-                    else transferir(it);
-                }));
+        card.setOnClickListener(v -> menuProduto(it));
         return card;
     }
 
@@ -192,9 +247,9 @@ public class VisualizarEstoqueFragment extends Fragment {
         Util.pedirNumero(requireContext(), "Abastecer " + produto.nome,
                 "Quantidade a adicionar", qtd -> {
                     try {
-                        new BancoControllerEstoque(requireContext())
+                        String mensagem = new BancoControllerEstoque(requireContext())
                                 .adicionarEstoqueGeral(produto.produtoId, qtd);
-                        Util.toast(requireContext(), "Estoque atualizado.");
+                        Util.toast(requireContext(), mensagem);
                     } catch (Exception e) {
                         Util.toast(requireContext(), "Erro ao abastecer: " + e.getMessage());
                     }

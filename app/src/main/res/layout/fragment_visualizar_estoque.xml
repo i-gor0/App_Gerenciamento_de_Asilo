@@ -67,10 +67,19 @@
         </LinearLayout>
 
         <Button
-            android:id="@+id/btnCadastrarProduto"
+            android:id="@+id/btnEscanearQR"
             android:layout_width="match_parent"
             android:layout_height="55dp"
             android:layout_marginTop="25dp"
+            android:text="Escanear QR Code"
+            android:textColor="#FFFFFF"
+            android:backgroundTint="#2876C7" />
+
+        <Button
+            android:id="@+id/btnCadastrarProduto"
+            android:layout_width="match_parent"
+            android:layout_height="55dp"
+            android:layout_marginTop="12dp"
             android:text="Cadastrar produto"
             android:textColor="#FFFFFF"
             android:backgroundTint="#2876C7" />

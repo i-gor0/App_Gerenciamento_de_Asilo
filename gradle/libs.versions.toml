@@ -9,8 +9,12 @@ constraintlayout = "2.2.2"
 activityKtx = "1.13.0"
 navigationFragment = "2.10.2"
 navigationUi = "2.10.2"
+zxingEmbedded = "4.3.0"
+zxingCore = "3.5.3"
 
 [libraries]
+zxing-embedded = { group = "com.journeyapps", name = "zxing-android-embedded", version.ref = "zxingEmbedded" }
+zxing-core = { group = "com.google.zxing", name = "core", version.ref = "zxingCore" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 ext-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
 espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }
